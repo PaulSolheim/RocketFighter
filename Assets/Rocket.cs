@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Rocket : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class Rocket : MonoBehaviour
 
     Rigidbody rigidBody;
     AudioSource audioSource;
+    bool inTransition = false;
+
 
     // Use this for initialization
     void Start()
@@ -19,6 +22,16 @@ public class Rocket : MonoBehaviour
 
     // Update is called once per frame
     void Update()
+    {
+        if (!inTransition)
+        {
+            Thrust();
+            Rotation();
+        }
+
+    }
+
+    private void Thrust()
     {
         if (Input.GetKey(KeyCode.Space))
         {
@@ -32,28 +45,43 @@ public class Rocket : MonoBehaviour
         }
         else
             audioSource.Stop();
-
-        Rotation();
     }
 
     void OnCollisionEnter(Collision collision)
     {
+        if (inTransition) { return;  }
+
         switch (collision.gameObject.tag)
         {
             case "Friendly":
                 // do nothing
                 print("OK");    // todo remove
                 break;
+            case "Finish":
+                inTransition = true;
+                LoadNextLevel();
+                break;
             default:
-                print("Dead");
-                // todo kill player
+                inTransition = true;
+                LoadFirstLevel();
                 break;
         }
     }
 
+    private static void LoadFirstLevel()
+    {
+        SceneManager.LoadScene(0);                // todo kill player
+    }
+
+    private static void LoadNextLevel()
+    {
+        SceneManager.LoadScene(1);
+    }
+
     private void Rotation()
     {
-        rigidBody.freezeRotation = true;
+        rigidBody.angularVelocity = Vector3.zero;
+
         float rotationThisFrame = rotationThrust * Time.deltaTime;
 
         if (Input.GetKey(KeyCode.A))
@@ -64,6 +92,6 @@ public class Rocket : MonoBehaviour
         {
             transform.Rotate(-Vector3.forward * rotationThisFrame);
         }
-        rigidBody.freezeRotation = false;
+        
     }
 }
