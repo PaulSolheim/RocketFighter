@@ -25,26 +25,31 @@ public class Rocket : MonoBehaviour
     {
         if (!inTransition)
         {
-            Thrust();
-            Rotation();
+            RespondToThrustInput();
+            RespondToRotateInput();
         }
 
     }
 
-    private void Thrust()
+    private void RespondToThrustInput()
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            if (!audioSource.isPlaying)
-            {
-                audioSource.Play();
-            }
-
-            rigidBody.AddRelativeForce(Vector3.up * mainThrust);
+            ApplyThrust();
             print("space");
         }
         else
             audioSource.Stop();
+    }
+
+    private void ApplyThrust()
+    {
+        if (!audioSource.isPlaying)
+        {
+            audioSource.Play();
+        }
+
+        rigidBody.AddRelativeForce(Vector3.up * mainThrust);
     }
 
     void OnCollisionEnter(Collision collision)
@@ -59,26 +64,28 @@ public class Rocket : MonoBehaviour
                 break;
             case "Finish":
                 inTransition = true;
-                LoadNextLevel();
+                Invoke("LoadNextLevel", 1f);  // todo parameterize time
                 break;
             default:
                 inTransition = true;
-                LoadFirstLevel();
+                Invoke("LoadFirstLevel", 1f);
                 break;
         }
     }
 
-    private static void LoadFirstLevel()
+    private void LoadFirstLevel()
     {
         SceneManager.LoadScene(0);                // todo kill player
+        inTransition = false;
     }
 
-    private static void LoadNextLevel()
+    private void LoadNextLevel()
     {
         SceneManager.LoadScene(1);
+        inTransition = false;
     }
 
-    private void Rotation()
+    private void RespondToRotateInput()
     {
         rigidBody.angularVelocity = Vector3.zero;
 
