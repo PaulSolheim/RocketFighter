@@ -7,6 +7,13 @@ public class Rocket : MonoBehaviour
 {
     [SerializeField] float rotationThrust = 100f;
     [SerializeField] float mainThrust = 100f;
+    [SerializeField] AudioClip mainEngine;
+    [SerializeField] AudioClip success;
+    [SerializeField] AudioClip death;
+
+    [SerializeField] ParticleSystem mainEngineParticles;
+    [SerializeField] ParticleSystem successParticles;
+    [SerializeField] ParticleSystem deathParticles;
 
     Rigidbody rigidBody;
     AudioSource audioSource;
@@ -39,17 +46,21 @@ public class Rocket : MonoBehaviour
             print("space");
         }
         else
+        {
             audioSource.Stop();
+            mainEngineParticles.Stop();
+        }
     }
 
     private void ApplyThrust()
     {
         if (!audioSource.isPlaying)
         {
-            audioSource.Play();
+            audioSource.PlayOneShot(mainEngine);
         }
 
         rigidBody.AddRelativeForce(Vector3.up * mainThrust);
+        mainEngineParticles.Play();
     }
 
     void OnCollisionEnter(Collision collision)
@@ -63,14 +74,29 @@ public class Rocket : MonoBehaviour
                 print("OK");    // todo remove
                 break;
             case "Finish":
-                inTransition = true;
-                Invoke("LoadNextLevel", 1f);  // todo parameterize time
+                StartSuccessSequence();
                 break;
             default:
-                inTransition = true;
-                Invoke("LoadFirstLevel", 1f);
+                StartDeathSequence();
                 break;
         }
+    }
+
+    private void StartDeathSequence()
+    {
+        inTransition = true;
+        audioSource.Stop();
+        audioSource.PlayOneShot(death);
+        Invoke("LoadFirstLevel", 1f);
+    }
+
+    private void StartSuccessSequence()
+    {
+        inTransition = true;
+        audioSource.Stop();
+        audioSource.PlayOneShot(success);
+        successParticles.Play();
+        Invoke("LoadNextLevel", 1f);  // todo parameterize time
     }
 
     private void LoadFirstLevel()
