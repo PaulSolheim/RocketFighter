@@ -570,7 +570,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationThrust: 100
-  mainThrust: 30
+  mainThrust: 1000
   mainEngine: {fileID: 8300000, guid: fa9a1a63cf768894bac10c76ee57ce11, type: 3}
   success: {fileID: 8300000, guid: b09bf4c0bd875304aabc32df69ad7209, type: 3}
   death: {fileID: 8300000, guid: 273231c6fb109e04da36d1685c1d5830, type: 3}

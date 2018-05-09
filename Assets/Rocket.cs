@@ -15,6 +15,8 @@ public class Rocket : MonoBehaviour
     [SerializeField] ParticleSystem successParticles;
     [SerializeField] ParticleSystem deathParticles;
 
+    [SerializeField] float levelLoadDelay = 2f;
+
     Rigidbody rigidBody;
     AudioSource audioSource;
     bool inTransition = false;
@@ -59,7 +61,7 @@ public class Rocket : MonoBehaviour
             audioSource.PlayOneShot(mainEngine);
         }
 
-        rigidBody.AddRelativeForce(Vector3.up * mainThrust);
+        rigidBody.AddRelativeForce(Vector3.up * mainThrust * Time.deltaTime);
         mainEngineParticles.Play();
     }
 
@@ -87,7 +89,7 @@ public class Rocket : MonoBehaviour
         inTransition = true;
         audioSource.Stop();
         audioSource.PlayOneShot(death);
-        Invoke("LoadFirstLevel", 1f);
+        Invoke("LoadFirstLevel", levelLoadDelay);
     }
 
     private void StartSuccessSequence()
@@ -96,7 +98,7 @@ public class Rocket : MonoBehaviour
         audioSource.Stop();
         audioSource.PlayOneShot(success);
         successParticles.Play();
-        Invoke("LoadNextLevel", 1f);  // todo parameterize time
+        Invoke("LoadNextLevel", levelLoadDelay);
     }
 
     private void LoadFirstLevel()
